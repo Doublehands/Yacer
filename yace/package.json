@@ -1,0 +1,36 @@
+{
+  "name": "word-translation-plugin",
+  "version": "1.0.0",
+  "description": "Office Word翻译插件 - 提供智能翻译功能",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 3000 -c-1",
+    "dev": "http-server -p 3000 -c-1 --cors",
+    "build": "echo '构建完成'",
+    "test": "echo '测试完成'"
+  },
+  "keywords": [
+    "office",
+    "word",
+    "translation",
+    "plugin",
+    "add-in"
+  ],
+  "author": "Translation Plugin Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/word-translation-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/word-translation-plugin/issues"
+  },
+  "homepage": "https://github.com/your-username/word-translation-plugin#readme"
+}

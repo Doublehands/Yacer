@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>翻译插件</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #0078d4;
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .feature-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0078d4;
+        }
+
+        .feature-section h3 {
+            margin: 0 0 15px 0;
+            color: #0078d4;
+            font-size: 18px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .usage-steps {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .usage-steps h3 {
+            margin: 0 0 15px 0;
+            color: #1976d2;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background: #1976d2;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            color: #155724;
+            margin-top: 20px;
+        }
+
+        .button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .button:hover {
+            background: #106ebe;
+        }
+
+        .button:active {
+            background: #005a9e;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 智能翻译插件</h1>
+            <p>为您的Word文档提供专业的翻译服务</p>
+        </div>
+
+        <div class="feature-section">
+            <h3>✨ 主要功能</h3>
+            <ul class="feature-list">
+                <li>右键菜单快速翻译</li>
+                <li>支持多种语言翻译</li>
+                <li>智能语言检测</li>
+                <li>一键插入翻译结果</li>
+                <li>美观的翻译弹窗</li>
+                <li>实时翻译状态显示</li>
+            </ul>
+        </div>
+
+        <div class="usage-steps">
+            <h3>📖 使用方法</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">在Word文档中选择要翻译的文本</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">右键点击选中的文本</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">选择"翻译选中文本"选项</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">在弹窗中选择目标语言并点击翻译</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-text">确认翻译结果后点击"插入到文档"</div>
+            </div>
+        </div>
+
+        <div class="status">
+            ✅ 插件已成功加载，可以开始使用！
+        </div>
+
+        <button class="button" onclick="testTranslation()">
+            🧪 测试翻译功能
+        </button>
+
+        <div class="footer">
+            <p>版本 1.0.0 | 支持Word 2016及以上版本</p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        Office.onReady(() => {
+            console.log('翻译插件已加载');
+        });
+
+        function testTranslation() {
+            // 测试翻译功能
+            Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const selectedText = result.value;
+                    if (selectedText && selectedText.trim()) {
+                        alert(`当前选中文本: "${selectedText}"\n\n请右键点击选中的文本，然后选择"翻译选中文本"来使用翻译功能。`);
+                    } else {
+                        alert('请先在文档中选择一些文本，然后再次点击测试按钮。');
+                    }
+                } else {
+                    alert('无法获取选中的文本，请确保在Word文档中使用此插件。');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

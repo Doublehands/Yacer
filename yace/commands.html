@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>翻译插件命令</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        Office.onReady(() => {
+            // 当Office.js准备就绪时，注册命令处理函数
+            if (Office.context.document) {
+                // 注册翻译选中文本的命令
+                Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onSelectionChanged);
+            }
+        });
+
+        // 处理右键菜单中的翻译命令
+        function translateSelectedText(event) {
+            // 获取选中的文本
+            Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const selectedText = result.value;
+                    if (selectedText && selectedText.trim()) {
+                        // 显示翻译弹窗
+                        showTranslationDialog(selectedText);
+                    } else {
+                        // 如果没有选中文本，提示用户
+                        Office.context.document.setSelectedDataAsync("请先选择要翻译的文本", {
+                            coercionType: Office.CoercionType.Text
+                        });
+                    }
+                }
+            });
+        }
+
+        // 显示翻译弹窗
+        function showTranslationDialog(originalText) {
+            // 创建弹窗HTML
+            const dialogHtml = `
+                <div id="translationDialog" style="
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    border: 2px solid #0078d4;
+                    border-radius: 8px;
+                    padding: 20px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    min-width: 400px;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #0078d4;">翻译工具</h3>
+                        <button onclick="closeDialog()" style="
+                            background: none;
+                            border: none;
+                            font-size: 20px;
+                            cursor: pointer;
+                            color: #666;
+                        ">&times;</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">原文：</label>
+                        <div style="
+                            background: #f5f5f5;
+                            padding: 10px;
+                            border-radius: 4px;
+                            border: 1px solid #ddd;
+                            min-height: 40px;
+                        ">${originalText}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">目标语言：</label>
+                        <select id="targetLanguage" style="
+                            width: 100%;
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        ">
+                            <option value="en">英语</option>
+                            <option value="zh">中文</option>
+                            <option value="ja">日语</option>
+                            <option value="ko">韩语</option>
+                            <option value="fr">法语</option>
+                            <option value="de">德语</option>
+                            <option value="es">西班牙语</option>
+                            <option value="ru">俄语</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">翻译结果：</label>
+                        <div id="translationResult" style="
+                            background: #f5f5f5;
+                            padding: 10px;
+                            border-radius: 4px;
+                            border: 1px solid #ddd;
+                            min-height: 40px;
+                        ">点击翻译按钮开始翻译...</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button onclick="closeDialog()" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: white;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        ">取消</button>
+                        <button onclick="translateText('${originalText}')" style="
+                            padding: 8px 16px;
+                            background: #0078d4;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        ">翻译</button>
+                        <button onclick="insertTranslation()" id="insertBtn" style="
+                            padding: 8px 16px;
+                            background: #107c10;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            display: none;
+                        ">插入到文档</button>
+                    </div>
+                </div>
+            `;
+            
+            // 将弹窗添加到文档中
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = dialogHtml;
+            document.body.appendChild(tempDiv.firstElementChild);
+            
+            // 添加全局函数到window对象
+            window.closeDialog = closeDialog;
+            window.translateText = translateText;
+            window.insertTranslation = insertTranslation;
+            window.originalText = originalText;
+        }
+
+        // 关闭弹窗
+        function closeDialog() {
+            const dialog = document.getElementById('translationDialog');
+            if (dialog) {
+                dialog.remove();
+            }
+        }
+
+        // 翻译文本
+        function translateText(originalText) {
+            const targetLanguage = document.getElementById('targetLanguage').value;
+            const resultDiv = document.getElementById('translationResult');
+            
+            // 显示翻译中状态
+            resultDiv.innerHTML = '翻译中...';
+            
+            // 这里使用免费的翻译API（Google Translate的替代方案）
+            // 在实际使用中，您可能需要注册一个翻译服务
+            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalText)}&langpair=auto|${targetLanguage}`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.responseStatus === 200) {
+                        const translatedText = data.responseData.translatedText;
+                        resultDiv.innerHTML = translatedText;
+                        
+                        // 显示插入按钮
+                        const insertBtn = document.getElementById('insertBtn');
+                        insertBtn.style.display = 'inline-block';
+                        
+                        // 保存翻译结果
+                        window.translatedText = translatedText;
+                    } else {
+                        resultDiv.innerHTML = '翻译失败，请重试';
+                    }
+                })
+                .catch(error => {
+                    console.error('翻译错误:', error);
+                    resultDiv.innerHTML = '翻译失败，请检查网络连接';
+                });
+        }
+
+        // 插入翻译结果到文档
+        function insertTranslation() {
+            if (window.translatedText) {
+                // 在当前光标位置插入翻译结果
+                Office.context.document.setSelectedDataAsync(window.translatedText, {
+                    coercionType: Office.CoercionType.Text
+                }, (result) => {
+                    if (result.status === Office.AsyncResultStatus.Succeeded) {
+                        // 插入成功后关闭弹窗
+                        closeDialog();
+                    } else {
+                        alert('插入失败，请重试');
+                    }
+                });
+            }
+        }
+
+        // 当选择改变时的处理
+        function onSelectionChanged(event) {
+            // 可以在这里添加选择改变时的逻辑
+        }
+    </script>
+</body>
+</html>
